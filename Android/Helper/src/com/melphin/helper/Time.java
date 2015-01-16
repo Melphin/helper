@@ -64,17 +64,43 @@ public class Time {
 	public final static String PREFIX_MONTHS_ALT = "months";
 	public final static String PREFIX_YEARS = "y";
 	public final static String PREFIX_YEARS_ALT = "years";
+
+	public final static String TEXT_VALUE_ZERO = "zero"; 
+	public final static String TEXT_VALUE_NONE = "none"; 
+	public final static String TEXT_VALUE_NULL = "null"; 
+	public final static String TEXT_VALUE_ONE = "one"; 
+	public final static String TEXT_VALUE_TWO = "two"; 
+	public final static String TEXT_VALUE_THREE = "three"; 
+	public final static String TEXT_VALUE_FOUR = "four"; 
+	public final static String TEXT_VALUE_FIVE = "five"; 
+	public final static String TEXT_VALUE_SIX = "six"; 
+	public final static String TEXT_VALUE_SEVEN = "seven"; 
+	public final static String TEXT_VALUE_EIGHT = "eight"; 
+	public final static String TEXT_VALUE_NINE = "nine";
 	
+	private final static String VALUE_PREFIX_PATTERN = "(\\d+|"+
+			TEXT_VALUE_ZERO+"\\s|"+
+			TEXT_VALUE_NONE+"\\s|"+
+			TEXT_VALUE_NULL+"\\s|"+
+			TEXT_VALUE_ONE+"\\s|"+
+			TEXT_VALUE_TWO+"\\s|"+
+			TEXT_VALUE_THREE+"\\s|"+
+			TEXT_VALUE_FOUR+"\\s|"+
+			TEXT_VALUE_FIVE+"\\s|"+
+			TEXT_VALUE_SIX+"\\s|"+
+			TEXT_VALUE_SEVEN+"\\s|"+
+			TEXT_VALUE_EIGHT+"\\s|"+
+			TEXT_VALUE_NINE+"\\s)";
 	private final static Pattern[] PREFIXES = new Pattern[]
 			{
-				Pattern.compile("(\\d+)\\s*("+PREFIX_MILLISECONDS_ALT+"|"+PREFIX_MILLISECONDS+")"),
-				Pattern.compile("(\\d+)\\s*("+PREFIX_SECONDS_ALT_2+"|"+PREFIX_SECONDS_ALT_1+"|"+PREFIX_SECONDS+")"),
-				Pattern.compile("(\\d+)\\s*("+PREFIX_MINUTES_ALT+"|"+PREFIX_MINUTES+")"),
-				Pattern.compile("(\\d+)\\s*("+PREFIX_HOURS_ALT+"|"+PREFIX_HOURS+")"),
-				Pattern.compile("(\\d+)\\s*("+PREFIX_DAYS_ALT+"|"+PREFIX_DAYS+")"),
-				Pattern.compile("(\\d+)\\s*("+PREFIX_WEEKS_ALT+"|"+PREFIX_WEEKS+")"),
-				Pattern.compile("(\\d+)\\s*("+PREFIX_MONTHS_ALT+"|"+PREFIX_MONTHS+"\\b)"),
-				Pattern.compile("(\\d+)\\s*("+PREFIX_YEARS_ALT+"|"+PREFIX_YEARS+")")
+				Pattern.compile(VALUE_PREFIX_PATTERN+"\\s*("+PREFIX_MILLISECONDS_ALT+"|"+PREFIX_MILLISECONDS+")"),
+				Pattern.compile(VALUE_PREFIX_PATTERN+"\\s*("+PREFIX_SECONDS_ALT_2+"|"+PREFIX_SECONDS_ALT_1+"|"+PREFIX_SECONDS+")"),
+				Pattern.compile(VALUE_PREFIX_PATTERN+"\\s*("+PREFIX_MINUTES_ALT+"|"+PREFIX_MINUTES+")"),
+				Pattern.compile(VALUE_PREFIX_PATTERN+"\\s*("+PREFIX_HOURS_ALT+"|"+PREFIX_HOURS+")"),
+				Pattern.compile(VALUE_PREFIX_PATTERN+"\\s*("+PREFIX_DAYS_ALT+"|"+PREFIX_DAYS+")"),
+				Pattern.compile(VALUE_PREFIX_PATTERN+"\\s*("+PREFIX_WEEKS_ALT+"|"+PREFIX_WEEKS+")"),
+				Pattern.compile(VALUE_PREFIX_PATTERN+"\\s*("+PREFIX_MONTHS_ALT+"|"+PREFIX_MONTHS+"\\b)"),
+				Pattern.compile(VALUE_PREFIX_PATTERN+"\\s*("+PREFIX_YEARS_ALT+"|"+PREFIX_YEARS+")")
 			};
 	private final static long[] PREFIXES_VALUES = new long[]
 			{
@@ -171,6 +197,14 @@ public class Time {
 		if (value == null || value.trim().equals(""))
 			return 0;
 		
+		try
+		{
+			long result = getValue(value);
+			return result;
+		}catch(Exception e)
+		{			
+		}
+		
 		Matcher m;
 		long v;
 		long result = 0;
@@ -180,7 +214,7 @@ public class Time {
 			{
 				try
 				{
-					v = Long.parseLong(m.group(1));
+					v = getValue(m.group(1));
 					result+=v*PREFIXES_VALUES[i];
 				}catch(Exception e){}
 			}
@@ -192,6 +226,43 @@ public class Time {
 	{
 		return parse_ms(value)/ONE_SECOND;
 	}
+
+	public static long getValue(String value) throws Exception
+	{
+		if (value==null || value.trim().equals(""))
+			return 0;
+		value = value.trim();
+		
+		try
+		{
+			return Long.parseLong(value);
+		}catch(Exception e)
+		{
+			if (value.equals(TEXT_VALUE_ZERO) ||
+					value.equals(TEXT_VALUE_NONE) ||
+					value.equals(TEXT_VALUE_NULL))
+				return 0;
+			if (value.equals(TEXT_VALUE_ONE))
+				return 1;
+			if (value.equals(TEXT_VALUE_TWO))
+				return 2;
+			if (value.equals(TEXT_VALUE_THREE))
+				return 3;
+			if (value.equals(TEXT_VALUE_FOUR))
+				return 4;
+			if (value.equals(TEXT_VALUE_FIVE))
+				return 5;
+			if (value.equals(TEXT_VALUE_SIX))
+				return 6;
+			if (value.equals(TEXT_VALUE_SEVEN))
+				return 7;
+			if (value.equals(TEXT_VALUE_EIGHT))
+				return 8;
+			if (value.equals(TEXT_VALUE_NINE))
+				return 9;
+		}
+		throw new Exception();
+	}	
 	
 	// TIME IN 
 	public static long milliseconds_in(long ms)
